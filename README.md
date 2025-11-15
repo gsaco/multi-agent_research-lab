@@ -40,21 +40,35 @@ cd multi-agent_research-lab
 pip install -r requirements.txt
 ```
 
-### 2. Set Up Hugging Face Token
+### 2. Test Your Setup
 
-Get your free token from [Hugging Face](https://huggingface.co/settings/tokens):
+Run the setup test to verify everything is installed correctly:
 
 ```bash
-export HF_TOKEN="your_huggingface_token_here"
+python test_setup.py
 ```
 
-Or in Python:
-```python
-from huggingface_hub import login
-login("your_huggingface_token_here")
+This will check:
+- ✓ All required packages are installed
+- ✓ API keys are configured
+- ✓ Agents can be created
+- ✓ Search tools are working
+
+### 3. Set Up API Keys
+
+You need an OpenAI API key to run the agents. See [CONFIGURATION.md](CONFIGURATION.md) for detailed setup instructions.
+
+Quick setup:
+```bash
+export OPENAI_API_KEY="sk-your-openai-key-here"
+export HF_TOKEN="hf-your-huggingface-token-here"  # Optional
 ```
 
-### 3. Run the Workflow
+Get your keys:
+- OpenAI: https://platform.openai.com/api-keys
+- Hugging Face: https://huggingface.co/settings/tokens
+
+### 4. Run the Workflow
 
 #### Option A: Using Python Script
 
