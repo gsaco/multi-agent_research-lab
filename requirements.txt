@@ -1,0 +1,10 @@
+crewai
+langchain
+langchain-community
+huggingface_hub
+duckduckgo-search
+chromadb
+pandas
+jupyter
+notebook
+ipykernel
