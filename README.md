@@ -1,6 +1,11 @@
-# Multi-Agent Research Lab
+# Multi-Agent Research Lab — Homework Submission
 
-A multi-agent AI system that simulates collaborative research using CrewAI, LangChain, and Hugging Face. Three autonomous agents work together to research AI topics, synthesize findings, and produce structured research summaries.
+This repository contains the assignment deliverables:
+
+- `src/agents.py` — Agent definitions and the research workflow
+- `notebooks/workflow_demo.ipynb` — Jupyter notebook demonstration
+- `research_summary.md` — Final Markdown report
+- `requirements.txt` — Python dependencies
 
 ## 🎯 Purpose
 
@@ -29,40 +34,44 @@ multi-agent_research-lab/
 
 ## 🚀 Quick Start
 
-### 1. Installation
+### Quick start
+
+1. Create and activate a Python environment (conda recommended):
 
 ```bash
-# Clone the repository
-git clone https://github.com/gsaco/multi-agent_research-lab.git
-cd multi-agent_research-lab
+conda create -n multiagent python=3.11 -y
+conda activate multiagent
+```
 
-# Install dependencies
+2. Install dependencies:
+
+```bash
 pip install -r requirements.txt
 ```
 
-### 2. Test Your Setup
+### 2. Configure the Hugging Face token
 
-Run the setup test to verify everything is installed correctly:
+This notebook uses the Hugging Face Inference API; create a token at https://huggingface.co/settings/tokens and set it as an environment variable.
 
 ```bash
-python test_setup.py
+export HF_TOKEN="hf_<your_token>"
+export HUGGINGFACEHUB_API_TOKEN="$HF_TOKEN"
+
+Alternatively, create a `.env` file in the repository root with the following contents (add this file to `.gitignore` so your token isn't committed):
+
+```
+# .env
+HF_TOKEN=hf_<your_token>
+HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
 ```
 
-This will check:
-- ✓ All required packages are installed
-- ✓ API keys are configured
-- ✓ Agents can be created
-- ✓ Search tools are working
+After creating `.env`, run `source .env` to populate your shell's environment before running the notebook. A `.env.example` file is included as a template — do not commit real tokens.
+The repository's `.gitignore` already excludes `.env`, so your token won't be committed.
+```
 
 ### 3. Set Up API Keys
 
-You need an OpenAI API key to run the agents. See [CONFIGURATION.md](CONFIGURATION.md) for detailed setup instructions.
-
-Quick setup:
-```bash
-export OPENAI_API_KEY="sk-your-openai-key-here"
-export HF_TOKEN="hf-your-huggingface-token-here"  # Optional
-```
+No OpenAI key is required. The notebook uses Hugging Face Inference API only (the HF token is used for authentication). The notebook contains a cell that logs in with the HF token for convenience.
 
 Get your keys:
 - OpenAI: https://platform.openai.com/api-keys
@@ -70,20 +79,17 @@ Get your keys:
 
 ### 4. Run the Workflow
 
-#### Option A: Using Python Script
-
-```bash
-cd src
-python agents.py "Impact of Synthetic Data in Healthcare"
-```
-
-#### Option B: Using Jupyter Notebook
+Run the workflow (notebook recommended):
 
 ```bash
 jupyter notebook notebooks/workflow_demo.ipynb
 ```
 
-Then follow the step-by-step instructions in the notebook.
+Or run directly from Python (minimal):
+
+```bash
+python src/agents.py "Impact of Synthetic Data in Healthcare"
+```
 
 ## 📝 Usage Examples
 
@@ -98,6 +104,11 @@ result = run_research_workflow(
     hf_token="your_token",
     output_file="research_summary.md"
 )
+
+# If you want the CrewAI orchestration to use a specific LLM provider (like
+# a Hugging Face provider), add creawi_llm_kwargs:
+# result = run_research_workflow(topic="Bias in LLMs", hf_token="your_token",
+#                                creawi_llm_kwargs={"provider": "huggingface"})
 ```
 
 ### Advanced Usage
@@ -107,7 +118,7 @@ from src.agents import ResearchAgents
 from crewai import Crew
 
 # Create custom agents
-agents_factory = ResearchAgents(hf_token="your_token")
+agents_factory = ResearchAgents(hf_token="your_token", creawi_llm_kwargs={"provider": "huggingface"})
 researcher = agents_factory.create_researcher()
 writer = agents_factory.create_writer()
 reviewer = agents_factory.create_reviewer()
@@ -127,28 +138,22 @@ crew = Crew(
 result = crew.kickoff()
 ```
 
-## 🔧 Requirements
+## Requirements
 
 - Python 3.10+
-- Hugging Face account (free)
-- Internet connection for web search
-- Libraries:
-  - crewai
-  - langchain
-  - langchain-community
-  - huggingface_hub
-  - duckduckgo-search
-  - chromadb
-  - pandas
+- Hugging Face account and token
+- Internet connection
 
-## 📊 Output Format
+Dependencies are available in `requirements.txt`.
 
-The system generates a structured Markdown research summary with:
+## Final output
 
-1. **Introduction** (75-100 words)
-2. **Key Findings** (200-250 words)
-3. **Ethical & Technical Challenges** (100-125 words)
-4. **Conclusion** (75-100 words)
+The final deliverable is `research_summary.md` — a ~500-word structured Markdown document with these sections:
+
+1. Introduction
+2. Key Findings
+3. Ethical & Technical Challenges
+4. Conclusion
 
 ## 🧪 Example Topics
 
@@ -169,33 +174,9 @@ This project demonstrates:
 - Automated content generation and review
 - Open-source AI toolchain usage
 
-## 📋 Evaluation Rubric
+## Rubric & deliverables
 
-| Criterion | Points | Status |
-|-----------|--------|--------|
-| Correct setup and configuration (CrewAI + Hugging Face) | 4 pts | ✓ |
-| Functional multi-agent collaboration (communication cycles working) | 6 pts | ✓ |
-| Researcher retrieves meaningful text data | 3 pts | ✓ |
-| Writer generates coherent, structured text via Hugging Face API | 3 pts | ✓ |
-| Reviewer produces factuality & coherence feedback | 2 pts | ✓ |
-| Markdown summary well-structured and readable | 2 pts | ✓ |
-| **Total** | **20 pts** | **20/20** |
+The repository provides the deliverables required by the assignment (agents, notebook, final MD). The notebook demonstrates the Researcher → Writer → Reviewer loop and produces `research_summary.md`.
 
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to:
-- Add new agent types
-- Improve search capabilities
-- Enhance summarization quality
-- Add support for additional LLM providers
-
-## 📄 License
-
-This project is open source and available for educational purposes.
-
-## 🔗 Resources
-
-- [CrewAI Documentation](https://docs.crewai.com/)
-- [LangChain Documentation](https://python.langchain.com/)
-- [Hugging Face Hub](https://huggingface.co/)
-- [DuckDuckGo Search API](https://github.com/deedy5/duckduckgo_search)
+## Notes
+The README was intentionally replaced with this minimal note so the repository only contains the assignment deliverables requested by the user.
