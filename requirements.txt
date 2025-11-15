@@ -1,8 +1,10 @@
 crewai
+crewai-tools
 langchain
 langchain-community
 huggingface_hub
 duckduckgo-search
+ddgs
 chromadb
 pandas
 jupyter

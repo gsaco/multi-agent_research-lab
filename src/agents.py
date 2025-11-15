@@ -7,27 +7,62 @@ This module defines three agents for collaborative research:
 """
 
 from crewai import Agent, Task, Crew
+from crewai.tools import BaseTool
 from langchain_community.tools import DuckDuckGoSearchRun
-from huggingface_hub import InferenceClient
+from typing import Type
+from pydantic import BaseModel, Field
 import os
+
+
+class SearchInput(BaseModel):
+    """Input schema for DuckDuckGoSearchTool."""
+    query: str = Field(..., description="Search query string")
+
+
+class DuckDuckGoSearchTool(BaseTool):
+    name: str = "DuckDuckGo Search"
+    description: str = (
+        "Search the web using DuckDuckGo search engine. "
+        "Useful for finding information, articles, and research papers."
+    )
+    args_schema: Type[BaseModel] = SearchInput
+    
+    def _run(self, query: str) -> str:
+        """Execute the search."""
+        search = DuckDuckGoSearchRun()
+        try:
+            results = search.run(query)
+            return results
+        except Exception as e:
+            return f"Search error: {str(e)}"
 
 
 class ResearchAgents:
     """Factory class for creating research agents"""
     
-    def __init__(self, hf_token=None):
+    def __init__(self, hf_token=None, llm_model="gpt-4o-mini"):
         """
         Initialize the research agents factory
         
         Args:
             hf_token: Hugging Face API token (optional, can be set via environment)
+            llm_model: LLM model to use for agents (default: gpt-4o-mini)
         """
         self.hf_token = hf_token or os.environ.get("HF_TOKEN")
         if not self.hf_token:
             print("Warning: No Hugging Face token provided. Set HF_TOKEN environment variable.")
         
+        # Set default OpenAI API key if not present (for CrewAI compatibility)
+        if not os.environ.get("OPENAI_API_KEY"):
+            # For demonstration purposes, we set a placeholder
+            # In production, users should provide their own API key
+            os.environ["OPENAI_API_KEY"] = "sk-placeholder"
+            print("Note: Using placeholder OpenAI API key. For actual execution, set OPENAI_API_KEY.")
+        
+        self.llm_model = llm_model
+        
         # Initialize search tool
-        self.search_tool = DuckDuckGoSearchRun()
+        self.search_tool = DuckDuckGoSearchTool()
     
     def create_researcher(self):
         """
@@ -45,7 +80,8 @@ class ResearchAgents:
                       "at identifying high-quality, authoritative sources and extracting key insights.",
             verbose=True,
             allow_delegation=False,
-            tools=[self.search_tool]
+            tools=[self.search_tool],
+            llm=self.llm_model
         )
         return researcher
     
@@ -65,7 +101,8 @@ class ResearchAgents:
                       "well-organized summaries that maintain technical accuracy while being "
                       "readable to a broad audience.",
             verbose=True,
-            allow_delegation=False
+            allow_delegation=False,
+            llm=self.llm_model
         )
         return writer
     
@@ -85,7 +122,8 @@ class ResearchAgents:
                       "logical inconsistencies, factual errors, and structural issues in "
                       "scientific writing.",
             verbose=True,
-            allow_delegation=False
+            allow_delegation=False,
+            llm=self.llm_model
         )
         return reviewer
     
